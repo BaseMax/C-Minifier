@@ -107,32 +107,39 @@ char* minify_c_code(char* code)
             {
                 // Append code[i] to temp
                 temp[temp_i++] = code[i];
+                i++;
             }
+            temp[temp_i] = '\0';
 
             // Append temp to `new_code`
             int k;
             for (k = 0; k < temp_i; k++)
             {
-                new_code[j++] = temp[k];
+                new_code[j] = temp[k];
+                j++;
             }
 
             if(strcmp(temp, "int") == 0 || strcmp(temp, "if") == 0 || strcmp(temp, "else") == 0 || strcmp(temp, "float") == 0 || strcmp(temp, "double") == 0 || strcmp(temp, "char") == 0 || strcmp(temp, "bool") == 0) {
-                if (code[i] == ' ' || code[i] == '\t' || code[i] == '\n' || code[i] == '\r') {
-                    new_code[j++] = ' ';
+                // printf("has int or a main ident %s\n", temp);
+                while (code[i] == ' ' || code[i] == '\t' || code[i] == '\n' || code[i] == '\r') {
+                    // printf("skip a char after keyword\n");
+                    i++;
                 }
+                if(code[i] != '(')
+                    new_code[j++] = ' ';
             }
 
             // Free temp
             free(temp);
         }
         else if (code[i] == '#') {
-            // while (code[i] != '\n') {
-            //     new_code[j] = code[i];
-            //     i++;
-            //     j++;
-            // }
-            // new_code[j] = '\n';
-            i++;
+            while (code[i] != '\n') {
+                new_code[j] = code[i];
+                i++;
+                j++;
+            }
+            new_code[j] = '\n';
+            j++;
         }
         else if (code[i] == ' ' || code[i] == '\n' || code[i] == '\r' || code[i] == '\t') {
             i++;
@@ -165,7 +172,12 @@ char* minify_c_code(char* code)
         }
         else {
             if (code[i] == '"') { // Write string double quotes
+                new_code[j] = code[i];
+                i++;
+                j++;
+
                 while (code[i] != '"') {
+                    printf("write to string: %c\n", code[i]);
                     new_code[j] = code[i];
                     j++;
                     i++;
