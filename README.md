@@ -40,4 +40,6 @@ And maybe sometime you need to write the result in another or same file:
 
 Welcome to help and feel free to contribute and send Pull request.
 
+Please open a issue if you find a bug and not have time to fix. Thanks in advance.
+
 © Copyright Max Base, 2022
