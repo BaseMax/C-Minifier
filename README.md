@@ -35,6 +35,7 @@ And maybe sometime you need to write the result in another or same file:
 
 ### TODO
 
+- Adding more C keywords if needed or missed
 - Automatically rename and make short identifier names (A hash-map list to keep original name and new random name and a function to generate a short (and unique) name)
 
 Welcome to help and feel free to contribute and send Pull request.
