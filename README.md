@@ -35,7 +35,6 @@ And maybe sometime you need to write the result in another or same file:
 
 ### TODO
 
-- Supporting user defined types (Keeping one space between `type` and `name` of the variable)
 - Adding more C keywords if needed or missed
 - Automatically rename and make short identifier names (A hash-map list to keep original name and new random name and a function to generate a short (and unique) name)
 
