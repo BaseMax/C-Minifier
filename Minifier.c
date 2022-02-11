@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 // Read whole file into memory and return char*
 char* file_read(char* filepath)
@@ -35,7 +36,7 @@ char* file_read(char* filepath)
     buffer[size] = '\0';
 
     fclose(file);
-    return buffer;
+    return(buffer);
 }
 
 // Remove inline and multi-line C-style comments
@@ -76,7 +77,7 @@ char* remove_comments(char* buffer)
         }
     }
     new_buffer[j] = '\0';
-    return new_buffer;
+    return(new_buffer);
 }
 
 // Minify C code
@@ -92,19 +93,48 @@ char* minify_c_code(char* code)
 
     int i = 0;
     int j = 0;
-    int is_macro = 0;
+
     while (code[i] != '\0') {
-        if (code[i] == '#') {
-            is_macro = 1;
-            while (code[i] != '\n') {
-                new_code[j] = code[i];
-                i++;
-                j++;
+        // Its allowed to keep only one space after main C keywords
+        // int, if, else, int, float, double, char, bool
+        
+        // Handle identifier
+        // if (code[i] == '_' || (code[i] >= 'a' && code[i] <= 'z') || (code[i] >= 'A' && code[i] <= 'Z')) {
+        if (isalpha(code[i]) || isdigit(code[i]) || code[i] == '_') {
+            char* temp = (char*)malloc(sizeof(char) * (52)); // 52 is the max length of an identifier
+            int temp_i = 0;
+            while (isalpha(code[i]) || isdigit(code[i]) || code[i] == '_')
+            {
+                // Append code[i] to temp
+                temp[temp_i++] = code[i];
             }
-            new_code[j] = '\n';
-            is_macro = 0;
+
+            // Append temp to `new_code`
+            int k;
+            for (k = 0; k < temp_i; k++)
+            {
+                new_code[j++] = temp[k];
+            }
+
+            if(strcmp(temp, "int") == 0 || strcmp(temp, "if") == 0 || strcmp(temp, "else") == 0 || strcmp(temp, "float") == 0 || strcmp(temp, "double") == 0 || strcmp(temp, "char") == 0 || strcmp(temp, "bool") == 0) {
+                if (code[i] == ' ' || code[i] == '\t' || code[i] == '\n' || code[i] == '\r') {
+                    new_code[j++] = ' ';
+                }
+            }
+
+            // Free temp
+            free(temp);
         }
-        else if (code[i] == ' ' || code[i] == '\n' || code[i] == '\t') {
+        else if (code[i] == '#') {
+            // while (code[i] != '\n') {
+            //     new_code[j] = code[i];
+            //     i++;
+            //     j++;
+            // }
+            // new_code[j] = '\n';
+            i++;
+        }
+        else if (code[i] == ' ' || code[i] == '\n' || code[i] == '\r' || code[i] == '\t') {
             i++;
         }
         else if (code[i] == '{' || code[i] == '}') {
@@ -135,7 +165,6 @@ char* minify_c_code(char* code)
         }
         else {
             if (code[i] == '"') { // Write string double quotes
-                i++;
                 while (code[i] != '"') {
                     new_code[j] = code[i];
                     j++;
@@ -155,7 +184,7 @@ char* minify_c_code(char* code)
 
     new_code[j] = '\0';
 
-    return new_code;
+    return(new_code);
 }
 
 // Start point
@@ -163,7 +192,7 @@ int main(int argc, char** argv)
 {
     if(argc == 1) {
         printf("Usage: %s <file>\n", argv[0]);
-        return 1;
+        return(1);
     }
 
     char* buffer = file_read(argv[1]);
@@ -184,5 +213,5 @@ int main(int argc, char** argv)
         printf("%s", buffer);
     }
 
-    return 0;
+    return(0);
 }
