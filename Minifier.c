@@ -80,6 +80,7 @@ char* remove_comments(char* buffer)
 }
 
 // Minify C code
+// Note: Add newline to `new_code` for MACRO and #include statements
 char* minify_c_code(char* code)
 {
     char* new_code = (char*)malloc(sizeof(char) * (strlen(code) + 1));
@@ -88,6 +89,71 @@ char* minify_c_code(char* code)
         printf("Error: Memory allocation failed\n");
         exit(1);
     }
+
+    int i = 0;
+    int j = 0;
+    int is_macro = 0;
+    while (code[i] != '\0') {
+        if (code[i] == '#') {
+            is_macro = 1;
+            while (code[i] != '\n') {
+                new_code[j] = code[i];
+                i++;
+                j++;
+            }
+            new_code[j] = '\n';
+            is_macro = 0;
+        }
+        else if (code[i] == ' ' || code[i] == '\n' || code[i] == '\t') {
+            i++;
+        }
+        else if (code[i] == '{' || code[i] == '}') {
+            new_code[j] = code[i];
+            j++;
+            i++;
+        }
+        else if (code[i] == ';') {
+            new_code[j] = code[i];
+            j++;
+            i++;
+            while (code[i] == ' ' || code[i] == '\n' || code[i] == '\t') {
+                i++;
+            }
+        }
+        else if (code[i] == '(' || code[i] == ')') {
+            new_code[j] = code[i];
+            j++;
+            i++;
+        }
+        else if (code[i] == ',') {
+            new_code[j] = code[i];
+            j++;
+            i++;
+            while (code[i] == ' ' || code[i] == '\n' || code[i] == '\t') {
+                i++;
+            }
+        }
+        else {
+            if (code[i] == '"') { // Write string double quotes
+                i++;
+                while (code[i] != '"') {
+                    new_code[j] = code[i];
+                    j++;
+                    i++;
+                }
+                new_code[j] = code[i];
+                j++;
+                i++;
+            }
+            else {
+                new_code[j] = code[i];
+                j++;
+                i++;
+            }
+        }
+    }
+
+    new_code[j] = '\0';
 
     return new_code;
 }
