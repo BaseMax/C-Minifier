@@ -111,7 +111,7 @@ char* minify_c_code(char* code)
                 j++;
             }
 
-            if(strcmp(temp, "sizeof") == 0 || strcmp(temp, "int") == 0|| strcmp(temp, "long") == 0 || strcmp(temp, "if") == 0 || strcmp(temp, "else") == 0 || strcmp(temp, "float") == 0 || strcmp(temp, "double") == 0 || strcmp(temp, "char") == 0 || strcmp(temp, "bool") == 0) {
+            if(strcmp(temp, "return") == 0 || strcmp(temp, "sizeof") == 0 || strcmp(temp, "int") == 0|| strcmp(temp, "long") == 0 || strcmp(temp, "if") == 0 || strcmp(temp, "else") == 0 || strcmp(temp, "float") == 0 || strcmp(temp, "double") == 0 || strcmp(temp, "char") == 0 || strcmp(temp, "bool") == 0) {
                 while (code[i] == ' ' || code[i] == '\t' || code[i] == '\n' || code[i] == '\r')
                     i++;
                 if(code[i] != '(')
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
 {
     if(argc == 1) {
         printf("Usage: %s <file>\n", argv[0]);
-        return(1);
+        return 1;
     }
 
     char* buffer = file_read(argv[1]);
@@ -226,5 +226,5 @@ int main(int argc, char** argv)
         printf("%s", buffer);
     }
 
-    return(0);
+    return 0;
 }
