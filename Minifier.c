@@ -119,7 +119,7 @@ char* minify_c_code(char* code)
                 j++;
             }
 
-            if(strcmp(temp, "int") == 0 || strcmp(temp, "if") == 0 || strcmp(temp, "else") == 0 || strcmp(temp, "float") == 0 || strcmp(temp, "double") == 0 || strcmp(temp, "char") == 0 || strcmp(temp, "bool") == 0) {
+            if(strcmp(temp, "sizeof") == 0 || strcmp(temp, "int") == 0|| strcmp(temp, "long") == 0 || strcmp(temp, "if") == 0 || strcmp(temp, "else") == 0 || strcmp(temp, "float") == 0 || strcmp(temp, "double") == 0 || strcmp(temp, "char") == 0 || strcmp(temp, "bool") == 0) {
                 // printf("has int or a main ident %s\n", temp);
                 while (code[i] == ' ' || code[i] == '\t' || code[i] == '\n' || code[i] == '\r') {
                     // printf("skip a char after keyword\n");
@@ -171,13 +171,26 @@ char* minify_c_code(char* code)
             }
         }
         else {
+            if (code[i] == '\'') { // Single quote char
+                new_code[j] = code[i];
+                j++;
+                i++;
+                while (code[i] != '\'') { // I am aware C not allow to put more then one char inside single quote
+                    new_code[j] = code[i];
+                    j++;
+                    i++;
+                }
+                new_code[j] = code[i];
+                j++;
+                i++;
+            }
             if (code[i] == '"') { // Write string double quotes
                 new_code[j] = code[i];
                 i++;
                 j++;
 
                 while (code[i] != '"') {
-                    printf("write to string: %c\n", code[i]);
+                    // printf("write to string: %c\n", code[i]);
                     new_code[j] = code[i];
                     j++;
                     i++;
