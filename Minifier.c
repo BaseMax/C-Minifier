@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 // Read whole file into memory and return char*
 char* file_read(char* filepath)
@@ -108,11 +109,11 @@ char* minify_c_code(char* code)
 				"switch|typedef|union|unsigned|void|"
 				"volatile|while";
 			int isKeyword = 0;
-			for(int startOfWord = 0, k = 0; keywords[k]; k++){
+			for(int startOfWord = 0, k = 0; keywords[k]; k++) {
 				if(keywords[k] != '|')
 					continue;
 
-				if(!memcmp(keywords + startOfWord , temp,k - startOfWord)){
+				if(!memcmp(keywords + startOfWord , temp,k - startOfWord)) {
 					isKeyword = 1;
 					break;
 				}
@@ -178,17 +179,59 @@ char* minify_c_code(char* code)
 		}
 		else {
 			if (code[i] == '\'') { // Single quote char
-				new_code[j] = code[i];
-				j++;
-				i++;
-				while (code[i] != '\'') { // I am aware C not allow to put more then one char inside single quote
-					new_code[j] = code[i];
-					j++;
-					i++;
+				i++;	   			   // convert it to a number for shorter code
+				if (code[i] != '\\') {
+					sprintf(new_code+j, "%d", code[i]);
+					j += ceil(log10(code[i+1]));
+					i += 2;
 				}
-				new_code[j] = code[i];
-				j++;
-				i++;
+				else {
+					int num = -1;
+					i++;
+					if ( code[i] == 'a')
+						num = '\a';
+					else if ( code[i] == 'b')
+						num = '\b';
+					else if ( code[i] == 'e')
+						num = '\e';
+					else if ( code[i] == 'f')
+						num = '\f';
+					else if ( code[i] == 'n')
+						num = '\n';
+					else if ( code[i] == 'r')
+						num = '\r';
+					else if ( code[i] == 't')
+						num = '\t';
+					else if ( code[i] == 'v')
+						num = '\v';
+					else if ( code[i] == '\\')
+						num = '\\';
+					else if ( code[i] == '\'')
+						num = '\'';
+					else if ( code[i] == '"')
+						num = '\"';
+					else if ( code[i] == '?')
+						num = '\?';
+					// octal/hexadecimal escapes
+					else if ( code[i] >= '0' && code[i] <= '7' || code[i] == 'x' || code[i] == 'u' || code[i] == 'U' ) {
+						int base = code[i] >= '0' && code[i] <= '7' ? 16 : 8;
+						num = 0;
+						while (code[i] != '\'') {
+							num = num * base + code[i] - '0';
+							i++;
+						}
+						i--;
+					}
+					if (num == -1){
+						fprintf(stderr,"\e[101;37mERROR\e[m: invalid escape sequence: \\%c",code[i]);
+						exit(1);
+					}
+					printf("\e[104;37mLOG\e[m: code+i==%s \n",code+i);
+					sprintf(new_code+j, "%d", num);
+					printf("\e[104;37mLOG\e[m: j==%s \n",new_code+j);
+					i += 2;
+					j += (num != 0 ? ceil(log10(num+1)) : 1);
+				}
 			}
 			if (code[i] == '"') { // Write string double quotes
 				new_code[j] = code[i];
